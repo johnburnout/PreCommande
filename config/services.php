@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use PreCommande\HookableInterface;
 use PreCommande\Plugin;
 use PreCommande\Validation\ValidatorFactory;
 use PreCommande\Vendor\Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
@@ -14,15 +13,13 @@ return static function (ContainerConfigurator $container): void {
     $services = $container->services()
         ->defaults()
             ->autowire()
-            ->autoconfigure()
+            // Pas d'autoconfigure ni d'instanceof : incompatibles avec le préfixage Strauss
+            // (voir src/DependencyInjection/HookablePass.php).
             ->bind('string $pluginFile', '%plugin.file%')
             ->bind('string $templatesDir', '%plugin.dir%/templates');
 
-    // Tout service qui s'accroche à WordPress est tagué automatiquement.
-    $services->instanceof(HookableInterface::class)->tag('precommande.hookable');
-
     $services->load('PreCommande\\', '../src/')
-        ->exclude(['../src/Kernel.php', '../src/Dto/']);
+        ->exclude(['../src/Kernel.php', '../src/Dto/', '../src/DependencyInjection/']);
 
     // $wpdb est injecté à l'exécution par le Kernel.
     $services->set(\wpdb::class)->synthetic();

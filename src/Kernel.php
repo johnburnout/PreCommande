@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace PreCommande;
 
+use PreCommande\DependencyInjection\HookablePass;
 use PreCommande\Vendor\Symfony\Component\Config\FileLocator;
 use PreCommande\Vendor\Symfony\Component\DependencyInjection\ContainerBuilder;
 use PreCommande\Vendor\Symfony\Component\DependencyInjection\ContainerInterface;
@@ -53,6 +54,7 @@ final class Kernel
         $builder->setParameter('plugin.dir', $dir);
 
         (new PhpFileLoader($builder, new FileLocator($dir . '/config')))->load('services.php');
+        $builder->addCompilerPass(new HookablePass());
         $builder->compile();
 
         return $builder;

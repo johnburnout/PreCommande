@@ -25,22 +25,23 @@ Sondage / précommande de vêtements ou d'objets.
 **Back-office** (menu *PréCommande*, droit `manage_options`)
 - *Résultats* : indicateurs (fiches, articles, montant estimé, modèles), synthèse par modèle et par taille (prix, quantités, montants, nb de participants, barres), détail de chaque fiche avec son total, suppression, export CSV avec prix unitaire et montant (compatible Excel FR).
 - *Modèles* : type de contenu `pc_modele`, colonnes photo / prix / tailles / proposé, ordre via « Attributs ».
+- *Contacter* : message à tous les participants ou à ceux ayant choisi un modèle, avec variables `{prenom}` `{nom}` (un e-mail individuel par personne).
 
 ### Prix
 - Prix unitaire facultatif par modèle (« 25,00 » ou « 25.00 »).
 - Prix spécifique par taille dans la liste des tailles : `XXL = 27,50`.
 - Le prix est **figé dans chaque fiche** au moment de la saisie : modifier un prix ensuite ne change pas les montants déjà enregistrés.
 - Devise : euro (constante `Money::CURRENCY`).
-- *Contacter* : message à tous les participants ou à ceux ayant choisi un modèle, avec variables `{prenom}` `{nom}` (un e-mail individuel par personne).
 
 ## Architecture
 
 ```
 precommande.php            Amorçage : autoload Composer, activation, boot du Kernel
-config/services.php        Configuration du conteneur Symfony (autowiring, autoconfiguration)
+config/services.php        Configuration du conteneur Symfony (autowiring)
+src/DependencyInjection/   HookablePass : tague les services HookableInterface
 src/Kernel.php             Construction / mise en cache du conteneur (var/cache/ si WP_DEBUG = false)
 src/Plugin.php             Point d'entrée : appelle register() sur chaque service tagué
-src/HookableInterface.php  Contrat des services qui posent des hooks WordPress (tag auto « precommande.hookable »)
+src/HookableInterface.php  Contrat des services qui posent des hooks WordPress (tag « precommande.hookable »)
 src/Installer.php          Tables wp_pc_participations / wp_pc_lignes (dbDelta + versionnage)
 src/Dto/                   ParticipationRequest + contraintes de validation (attributs)
 src/Repository/            ModelRepository (CPT) et ParticipationRepository ($wpdb)
@@ -60,6 +61,8 @@ Composants Symfony : `dependency-injection`, `config`, `http-foundation`, `valid
 Strauss renomme toutes les classes Symfony et PSR en `PreCommande\Vendor\…` : plusieurs plugins peuvent embarquer des versions différentes de Symfony sans conflit. Le code du plugin référence directement ces noms préfixés (`use PreCommande\Vendor\Symfony\…`).
 Seuls les polyfills (`symfony/polyfill-*`) et `symfony/deprecation-contracts` ne sont pas préfixés : ils définissent des fonctions globales protégées par `function_exists`, donc sans risque de conflit.
 Le conteneur compilé en cache porte aussi un nom propre au plugin (`PreCommandeCachedContainer`).
+
+**Ne pas utiliser `instanceof`, `autoconfigure()` ni `parent()` dans `config/services.php`** : ces fonctions de Symfony convertissent les définitions par sérialisation avec des positions codées en dur pour le nom de classe d'origine, ce qui casse une fois Symfony préfixé. Le tag `precommande.hookable` est posé par `src/DependencyInjection/HookablePass.php`.
 
 ### Modèle de données
 - `wp_pc_participations` : id, nom, prenom, email (unique), telephone, created_at
