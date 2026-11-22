@@ -78,3 +78,7 @@ La taille est stockée en texte : si un modèle est modifié après coup, les r�
 - Modification de sa fiche par le participant (lien unique par e-mail).
 - Pagination / recherche dans le détail des fiches.
 - Tests (PHPUnit + WP test suite) et traductions.
+
+## Licence
+Ce plugin est distribué sous licence GNU General Public License, version 2 ou ultérieure (GPL-2.0-or-later).
+Voir le fichier [`LICENSE`](LICENSE) pour le texte complet.
