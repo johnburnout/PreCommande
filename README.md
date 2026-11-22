@@ -1,8 +1,10 @@
-# PréCommande — plugin WordPress (v0.2.0)
+# PréCommande — plugin WordPress (v0.3.0)
 
 Sondage / précommande de vêtements ou d'objets.
 
 ## Installation
+
+Le plus simple : télécharger `precommande.zip` depuis la [dernière release](https://github.com/johnburnout/PreCommande/releases/latest) et l'installer via *Extensions › Ajouter › Téléverser* (dépendances incluses, pas besoin de Composer). Sinon, depuis les sources :
 
 1. Copier le dossier `precommande/` dans `wp-content/plugins/`.
 2. Dans ce dossier : `composer install --no-dev -o`
@@ -69,6 +71,17 @@ Le conteneur compilé en cache porte aussi un nom propre au plugin (`PreCommande
 - `wp_pc_lignes` : id, participation_id, modele_id, taille, quantite, prix_unitaire (NULL si pas de prix)
 
 La taille est stockée en texte : si un modèle est modifié après coup, les réponses existantes restent visibles.
+
+## Mises à jour et publication
+
+Le plugin se met à jour depuis les releases GitHub, comme un plugin du répertoire WordPress (notification puis bouton « Mettre à jour » dans *Extensions*), grâce à [Plugin Update Checker](https://github.com/YahnisElsts/plugin-update-checker), initialisé dans `precommande.php` hors du conteneur Symfony.
+
+Publier une version :
+1. Mettre à jour le numéro dans l'en-tête de `precommande.php` (`Version:`) **et** dans `Plugin::VERSION`.
+2. Commiter, pousser, puis créer la release avec un tag `vX.Y.Z` correspondant (`gh release create vX.Y.Z`). Les notes de la release servent de journal des modifications dans WordPress.
+3. Le workflow `.github/workflows/release.yml` vérifie les numéros de version, lance `composer install --no-dev`, construit `precommande.zip` et l'attache à la release. Il peut être relancé à la main (*Actions › Release › Run workflow*) pour un tag existant.
+
+Seul l'asset `precommande.zip` est installé : une release sans cet asset (workflow en échec) est ignorée par les sites, qui ne reçoivent jamais le zip source de GitHub, dépourvu de `vendor/`.
 
 ## Points d'attention
 - Toujours lancer `composer install` (et non `composer install --no-scripts`) pour que le préfixage soit appliqué.

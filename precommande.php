@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       PréCommande
  * Description:       Sondage / précommande de vêtements et d'objets (modèles, tailles, prix, résultats, contact des participants).
- * Version:           0.2.0
+ * Version:           0.3.0
  * Requires at least: 6.0
  * Requires PHP:      8.1
  * Text Domain:       precommande
@@ -28,6 +28,21 @@ if (!is_file(__DIR__ . '/vendor-prefixed/autoload.php') || !is_file(__DIR__ . '/
 
 require __DIR__ . '/vendor-prefixed/autoload.php';
 require __DIR__ . '/vendor/autoload.php';
+
+/*
+ * Mises à jour depuis les releases GitHub (Plugin Update Checker).
+ * Volontairement hors du conteneur Symfony : si une version casse le Kernel,
+ * le site peut encore recevoir la version corrective.
+ * Le zip installé est l'asset « precommande.zip » construit par
+ * .github/workflows/release.yml. L'asset est obligatoire (REQUIRE_RELEASE_ASSETS = 2,
+ * valeur stable dans toute la v5) : sans lui, une release est ignorée au lieu
+ * d'installer le zip source de GitHub, qui ne contient pas vendor/.
+ */
+\YahnisElsts\PluginUpdateChecker\v5\PucFactory::buildUpdateChecker(
+    'https://github.com/johnburnout/PreCommande/',
+    __FILE__,
+    'precommande'
+)->getVcsApi()->enableReleaseAssets('/^precommande\.zip$/', 2);
 
 register_activation_hook(__FILE__, [\PreCommande\Installer::class, 'activate']);
 

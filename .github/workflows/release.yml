@@ -1,0 +1,58 @@
+# Construit le zip installable du plugin (avec vendor/ et vendor-prefixed/)
+# et l'attache à la release sous le nom precommande.zip.
+# C'est ce fichier que les sites téléchargent via Plugin Update Checker.
+name: Release
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag de la release à (re)construire, ex. v0.3.0"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      TAG: ${{ github.event.release.tag_name || inputs.tag }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.TAG }}
+
+      - name: Vérifier la cohérence des numéros de version
+        run: |
+          expected="${TAG#v}"
+          header=$(sed -n 's/^ \* Version: *//p' precommande.php | tr -d '[:space:]')
+          constant=$(sed -n "s/.*const VERSION = '\(.*\)';/\1/p" src/Plugin.php)
+          echo "tag=$expected en-tête=$header Plugin::VERSION=$constant"
+          if [ "$header" != "$expected" ] || [ "$constant" != "$expected" ]; then
+            echo "::error::La version de precommande.php ($header) et de Plugin::VERSION ($constant) doit être $expected"
+            exit 1
+          fi
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.1"
+          tools: composer:v2
+
+      - name: Installer les dépendances (préfixage Strauss inclus)
+        run: composer install --no-dev --optimize-autoloader --no-interaction --no-progress
+
+      - name: Construire precommande.zip
+        run: |
+          mkdir -p build
+          git archive --format=tar --prefix=precommande/ HEAD \
+            | tar -x -C build --exclude='precommande/.github' --exclude='precommande/.gitignore'
+          cp -R vendor vendor-prefixed build/precommande/
+          (cd build && zip -rq ../precommande.zip precommande)
+          unzip -l precommande.zip | tail -1
+
+      - name: Attacher le zip à la release
+        run: gh release upload "$TAG" precommande.zip --clobber
