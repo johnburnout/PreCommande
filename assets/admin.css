@@ -1,0 +1,14 @@
+.pc-admin .pc-kpis { display: flex; gap: 1em; margin: 1.5em 0; flex-wrap: wrap; }
+.pc-admin .pc-kpi { background: #fff; border: 1px solid #dcdcde; border-radius: 6px; padding: 1em 1.4em; min-width: 160px; }
+.pc-admin .pc-kpi__value { display: block; font-size: 2em; font-weight: 600; line-height: 1.2; }
+.pc-admin .pc-kpi__label { color: #646970; }
+.pc-admin .pc-stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 1em; }
+.pc-admin .pc-stat { max-width: none; margin: 0; padding: 1em; }
+.pc-admin .pc-stat__head { display: flex; align-items: center; gap: .8em; margin-bottom: .6em; }
+.pc-admin .pc-stat__head img { width: 48px; height: 48px; object-fit: cover; border-radius: 4px; }
+.pc-admin .pc-stat__head h3 { margin: 0; flex: 1; }
+.pc-admin .pc-stat__total { font-size: 1.4em; font-weight: 600; }
+.pc-admin .pc-bar-cell { width: 40%; }
+.pc-admin .pc-bar { display: block; height: 10px; background: #2271b1; border-radius: 5px; min-width: 2px; }
+.pc-admin .pc-detail { margin-top: .5em; }
+.pc-admin .pc-stat__total small { display: block; font-size: .6em; font-weight: 400; color: #646970; text-align: right; }

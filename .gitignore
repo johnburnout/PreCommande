@@ -1,0 +1,5 @@
+vendor/
+vendor-prefixed/
+bin/
+var/
+composer.lock
