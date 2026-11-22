@@ -1,4 +1,4 @@
-# PréCommande — plugin WordPress (v0.3.0)
+# PréCommande — plugin WordPress (v0.3.1)
 
 Sondage / précommande de vêtements ou d'objets.
 
@@ -85,7 +85,8 @@ Seul l'asset `precommande.zip` est installé : une release sans cet asset (workf
 
 ## Points d'attention
 - Toujours lancer `composer install` (et non `composer install --no-scripts`) pour que le préfixage soit appliqué.
-- Après modification de `config/` ou de `src/` en production, supprimer `var/cache/container.php`.
+- Le cache du conteneur (`var/cache/container-<clé>.php`) est invalidé automatiquement à chaque changement de version ou de `config/services.php`. Après une modification de `src/` directement sur un serveur de production, sans changer de version, vider `var/cache/`.
+- `PhpDumper` écrit ses `use Symfony\…` en texte brut, non préfixé par Strauss : `Kernel::prefixImports()` les corrige avant l'écriture du cache.
 - Envois groupés via `wp_mail` : au-delà de quelques centaines de destinataires, prévoir un SMTP transactionnel et un envoi en file d'attente.
 - RGPD : prévoir la mention d'information complète et la purge des données après la campagne.
 

@@ -6,7 +6,7 @@ namespace PreCommande;
 
 final class Plugin
 {
-    public const VERSION = '0.3.0';
+    public const VERSION = '0.3.1';
 
     /**
      * @param iterable<HookableInterface> $hookables

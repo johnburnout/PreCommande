@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       PréCommande
  * Description:       Sondage / précommande de vêtements et d'objets (modèles, tailles, prix, résultats, contact des participants).
- * Version:           0.3.0
+ * Version:           0.3.1
  * Requires at least: 6.0
  * Requires PHP:      8.1
  * Text Domain:       precommande
@@ -47,7 +47,20 @@ require __DIR__ . '/vendor/autoload.php';
 register_activation_hook(__FILE__, [\PreCommande\Installer::class, 'activate']);
 
 add_action('plugins_loaded', static function (): void {
-    \PreCommande\Kernel::boot(__FILE__)
-        ->get(\PreCommande\Plugin::class)
-        ->register();
+    // Une erreur au démarrage du plugin ne doit pas rendre tout le site inaccessible :
+    // on la journalise, on affiche une alerte dans l'admin et le reste du site continue.
+    // Les mises à jour (ci-dessus) restent actives pour recevoir le correctif.
+    try {
+        \PreCommande\Kernel::boot(__FILE__)
+            ->get(\PreCommande\Plugin::class)
+            ->register();
+    } catch (\Throwable $e) {
+        error_log('PréCommande : échec du démarrage : ' . $e);
+        add_action('admin_notices', static function () use ($e): void {
+            printf(
+                '<div class="notice notice-error"><p><strong>PréCommande est désactivé suite à une erreur :</strong> %s</p></div>',
+                esc_html($e->getMessage())
+            );
+        });
+    }
 });
